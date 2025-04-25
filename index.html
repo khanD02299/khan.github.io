@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Video Downloader | Download Videos from YouTube, Facebook, Instagram, TikTok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+        }
+        .platform-icon {
+            transition: all 0.3s ease;
+        }
+        .platform-card:hover .platform-icon {
+            transform: translateY(-5px);
+        }
+        .loading-spinner {
+            border-top-color: #6366f1;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-download text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold">Social Video Downloader</h1>
+                </div>
+                <nav class="flex space-x-6">
+                    <a href="#features" class="hover:underline">Features</a>
+                    <a href="#how-it-works" class="hover:underline">How It Works</a>
+                    <a href="#supported" class="hover:underline">Supported Platforms</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Download Videos from Any Social Platform</h2>
+                <p class="text-xl mb-8 opacity-90">Fast, free and easy to use video downloader for YouTube, Facebook, Instagram, TikTok and more.</p>
+                
+                <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl mx-auto">
+                    <div class="flex">
+                        <input type="text" id="videoUrl" placeholder="Paste video URL here..." 
+                               class="flex-grow px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-800">
+                        <button id="downloadBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-r-lg font-medium transition-colors">
+                            Download
+                        </button>
+                    </div>
+                    <div id="errorMessage" class="text-red-500 mt-2 text-sm hidden"></div>
+                </div>
+                
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <span class="text-sm opacity-80">Try with:</span>
+                    <button class="text-sm bg-white bg-opacity-10 hover:bg-opacity-20 px-3 py-1 rounded-full transition-colors example-url" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                        YouTube
+                    </button>
+                    <button class="text-sm bg-white bg-opacity-10 hover:bg-opacity-20 px-3 py-1 rounded-full transition-colors example-url" data-url="https://www.instagram.com/reel/Cx9JtVjNQoD/">
+                        Instagram
+                    </button>
+                    <button class="text-sm bg-white bg-opacity-10 hover:bg-opacity-20 px-3 py-1 rounded-full transition-colors example-url" data-url="https://www.tiktok.com/@tiktok/video/7106624665865973038">
+                        TikTok
+                    </button>
+                    <button class="text-sm bg-white bg-opacity-10 hover:bg-opacity-20 px-3 py-1 rounded-full transition-colors example-url" data-url="https://www.facebook.com/watch/?v=10154788854091817">
+                        Facebook
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results" class="py-12 bg-white hidden">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Download Options</h3>
+                    <button id="newDownload" class="text-purple-600 hover:text-purple-800 font-medium">
+                        <i class="fas fa-redo mr-1"></i> New Download
+                    </button>
+                </div>
+                
+                <div id="videoInfo" class="bg-gray-50 rounded-lg p-4 mb-6 hidden">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-shrink-0">
+                            <img id="videoThumbnail" src="" alt="Video thumbnail" class="w-32 h-24 object-cover rounded-lg">
+                        </div>
+                        <div>
+                            <h4 id="videoTitle" class="font-bold text-gray-800 mb-1"></h4>
+                            <p id="videoDuration" class="text-sm text-gray-600 mb-2"></p>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-eye mr-1"></i>
+                                <span id="videoViews" class="mr-3"></span>
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                <span id="videoDate"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="downloadOptions" class="grid grid-cols-1 gap-4">
+                    <!-- Options will be inserted here by JavaScript -->
+                </div>
+                
+                <div id="loading" class="text-center py-12 hidden">
+                    <div class="inline-block h-8 w-8 border-4 border-gray-300 border-t-purple-600 rounded-full loading-spinner"></div>
+                    <p class="mt-4 text-gray-600">Analyzing video link...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Powerful Features</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Our downloader provides everything you need to save videos from social media</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-bolt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Fast Downloads</h3>
+                    <p class="text-gray-600">Get your videos downloaded in seconds with our high-speed servers.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Safe & Secure</h3>
+                    <p class="text-gray-600">No registration required. We don't store your videos or personal data.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-mobile-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Mobile Friendly</h3>
+                    <p class="text-gray-600">Works perfectly on all devices - smartphones, tablets and computers.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-film text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Multiple Formats</h3>
+                    <p class="text-gray-600">Download videos in MP4, WEBM or audio-only MP3 format.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-hd text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">HD Quality</h3>
+                    <p class="text-gray-600">Supports up to 4K resolution where available from the source.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-infinity text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">No Limits</h3>
+                    <p class="text-gray-600">Unlimited downloads with no restrictions or watermarks added.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">How To Download Videos</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Just follow these simple steps to save any video</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">
+                        1
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Copy Video URL</h3>
+                    <p class="text-gray-600">Find the video you want to download on YouTube, Instagram, TikTok or other platform and copy its link.</p>
+                </div>
+                
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">
+                        2
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Paste URL Here</h3>
+                    <p class="text-gray-600">Paste the video URL into the input field above and click the download button.</p>
+                </div>
+                
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">
+                        3
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Save Your Video</h3>
+                    <p class="text-gray-600">Choose your preferred format and quality, then download the video to your device.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Platforms Section -->
+    <section id="supported" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Supported Platforms</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">We support downloading from all major social networks</p>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 max-w-5xl mx-auto">
+                <div class="platform-card bg-white p-6 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="platform-icon w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-youtube text-3xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800">YouTube</h3>
+                </div>
+                
+                <div class="platform-card bg-white p-6 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="platform-icon w-16 h-16 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-instagram text-3xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800">Instagram</h3>
+                </div>
+                
+                <div class="platform-card bg-white p-6 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="platform-icon w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-facebook text-3xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800">Facebook</h3>
+                </div>
+                
+                <div class="platform-card bg-white p-6 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="platform-icon w-16 h-16 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-tiktok text-3xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800">TikTok</h3>
+                </div>
+                
+                <div class="platform-card bg-white p-6 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="platform-icon w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-twitter text-3xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800">Twitter</h3>
+                </div>
+                
+                <div class="platform-card bg-white p-6 rounded-xl shadow-sm text-center cursor-pointer hover:shadow-md transition-shadow">
+                    <div class="platform-icon w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-reddit text-3xl"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-800">Reddit</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Find answers to common questions about our video downloader</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full text-left p-4 bg-gray-50 hover:bg-gray-100 transition-colors font-medium flex justify-between items-center">
+                        <span>Is this video downloader free to use?</span>
+                        <i class="fas fa-chevron-down transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 border-t border-gray-200">
+                        <p class="text-gray-600">Yes, our video downloader is completely free to use. There are no hidden charges or subscription fees. You can download as many videos as you want without any limitations.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full text-left p-4 bg-gray-50 hover:bg-gray-100 transition-colors font-medium flex justify-between items-center">
+                        <span>What video formats are supported?</span>
+                        <i class="fas fa-chevron-down transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 border-t border-gray-200">
+                        <p class="text-gray-600">Our downloader supports MP4, WEBM, and 3GP video formats. You can also download audio-only in MP3 format. The available formats depend on what the original platform provides.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full text-left p-4 bg-gray-50 hover:bg-gray-100 transition-colors font-medium flex justify-between items-center">
+                        <span>Can I download private or age-restricted videos?</span>
+                        <i class="fas fa-chevron-down transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 border-t border-gray-200">
+                        <p class="text-gray-600">No, our tool can only download publicly available videos. Private videos, age-restricted content, or videos that require login cannot be downloaded due to platform restrictions.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full text-left p-4 bg-gray-50 hover:bg-gray-100 transition-colors font-medium flex justify-between items-center">
+                        <span>Is there a limit to video length I can download?</span>
+                        <i class="fas fa-chevron-down transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 border-t border-gray-200">
+                        <p class="text-gray-600">There's no technical limit, but very long videos (over 1 hour) may take more time to process. Some platforms may also have their own restrictions on video length.</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <button class="faq-toggle w-full text-left p-4 bg-gray-50 hover:bg-gray-100 transition-colors font-medium flex justify-between items-center">
+                        <span>Do you store or keep copies of downloaded videos?</span>
+                        <i class="fas fa-chevron-down transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden p-4 border-t border-gray-200">
+                        <p class="text-gray-600">No, we don't store any videos on our servers. The download process happens in real-time and the video is sent directly to your device without being saved on our side.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to Download Videos?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">Start downloading videos from any social platform in seconds</p>
+            <a href="#" class="inline-block bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-3 rounded-lg transition-colors">
+                Download Now
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-download text-purple-500 text-xl mr-2"></i>
+                        <span class="text-white font-bold text-lg">Social Video Downloader</span>
+                    </div>
+                    <p class="mb-4">The fastest way to download videos from social media platforms without any software installation.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a></li>
+                        <li><a href="#supported" class="hover:text-white transition-colors">Supported Platforms</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-bold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">DMCA</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-bold mb-4">Newsletter</h3>
+                    <p class="mb-4">Subscribe to get updates on new features and supported platforms.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-1 focus:ring-purple-500 w-full">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-r-lg transition-colors">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p>&copy; 2023 Social Video Downloader. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Example URLs
+            document.querySelectorAll('.example-url').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.getElementById('videoUrl').value = this.getAttribute('data-url');
+                });
+            });
+            
+            // FAQ toggle
+            document.querySelectorAll('.faq-toggle').forEach(button => {
+                button.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    content.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+            
+            // Download button functionality
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                const videoUrl = document.getElementById('videoUrl').value.trim();
+                const errorElement = document.getElementById('errorMessage');
+                
+                if (!videoUrl) {
+                    errorElement.textContent = 'Please enter a video URL';
+                    errorElement.classList.remove('hidden');
+                    return;
+                }
+                
+                // Validate URL format
+                if (!isValidUrl(videoUrl)) {
+                    errorElement.textContent = 'Please enter a valid URL';
+                    errorElement.classList.remove('hidden');
+                    return;
+                }
+                
+                errorElement.classList.add('hidden');
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('videoInfo').classList.add('hidden');
+                document.getElementById('downloadOptions').innerHTML = '';
+                document.getElementById('loading').classList.remove('hidden');
+                
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    // This is where you would normally make an API call to your backend
+                    // For demo purposes, we'll simulate a response
+                    simulateApiResponse(videoUrl);
+                }, 1500);
+            });
+            
+            // New download button
+            document.getElementById('newDownload').addEventListener('click', function() {
+                document.getElementById('videoUrl').value = '';
+                document.getElementById('videoUrl').focus();
+                document.getElementById('results').classList.add('hidden');
+            });
+            
+            // Helper function to validate URLs
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            // Simulate API response with demo data
+            function simulateApiResponse(url) {
+                document.getElementById('loading').classList.add('hidden');
+                
+                // Check which platform the URL is from
+                let platform = 'unknown';
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    platform = 'youtube';
+                } else if (url.includes('instagram.com')) {
+                    platform = 'instagram';
+                } else if (url.includes('tiktok.com')) {
+                    platform = 'tiktok';
+                } else if (url.includes('facebook.com')) {
+                    platform = 'facebook';
+                } else if (url.includes('twitter.com')) {
+                    platform = 'twitter';
+                } else if (url.includes('reddit.com')) {
+                    platform = 'reddit';
+                }
+                
+                // Generate demo video info based on platform
+                const demoData = {
+                    title: getDemoTitle(platform),
+                    thumbnail: getDemoThumbnail(platform),
+                    duration: getRandomDuration(),
+                    views: getRandomViews(),
+                    date: getRandomDate(),
+                    formats: getDemoFormats(platform)
+                };
+                
+                // Display video info
+                document.getElementById('videoTitle').textContent = demoData.title;
+                document.getElementById('videoThumbnail').src = demoData.thumbnail;
+                document.getElementById('videoDuration').textContent = `Duration: ${demoData.duration}`;
+                document.getElementById('videoViews').textContent = demoData.views;
+                document.getElementById('videoDate').textContent = demoData.date;
+                document.getElementById('videoInfo').classList.remove('hidden');
+                
+                // Display download options
+                const optionsContainer = document.getElementById('downloadOptions');
+                optionsContainer.innerHTML = '';
+                
+                demoData.formats.forEach(format => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200';
+                    optionElement.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center">
+                                <i class="fas ${format.type === 'video' ? 'fa-film' : 'fa-music'} text-purple-600 mr-3"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">${format.quality}</h4>
+                                    <p class="text-sm text-gray-600">${format.type.toUpperCase()} • ${format.size}</p>
+                                </div>
+                            </div>
+                            <a href="#" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors download-btn" 
+                               data-quality="${format.quality}" data-type="${format.type}">
+                                Download
+                            </a>
+                        </div>
+                        ${format.note ? `<p class="text-xs text-gray-500 mt-1">${format.note}</p>` : ''}
+                    `;
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // Add download button events
+                document.querySelectorAll('.download-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const quality = this.getAttribute('data-quality');
+                        const type = this.getAttribute('data-type');
+                        alert(`In a real application, this would download the ${quality} ${type} version of the video.`);
+                    });
+                });
+            }
+            
+            // Helper functions for demo data
+            function getDemoTitle(platform) {
+                const titles = {
+                    youtube: "How to Build a Website - Full Tutorial for Beginners",
+                    instagram: "Amazing sunset view from the beach #sunset #vacation",
+                    tiktok: "This trick will change your life! 😱 #lifehack",
+                    facebook: "Funny cat compilation that will make you laugh",
+                    twitter: "Breaking news: Major announcement coming soon",
+                    reddit: "The most satisfying video you'll see today",
+                    unknown: "Downloaded Video"
+                };
+                return titles[platform] || titles.unknown;
+            }
+            
+            function getDemoThumbnail(platform) {
+                const thumbnails = {
+                    youtube: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+                    instagram: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+                    tiktok: "https://images.unsplash.com/photo-1611605698335-8b1569810432",
+                    facebook: "https://images.unsplash.com/photo-1533738363-b7f9aef128ce",
+                    twitter: "https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea",
+                    reddit: "https://images.unsplash.com/photo-1611605698329-a21a0a6a0b0f",
+                    unknown: "https://images.unsplash.com/photo-1611605698329-a21a0a6a0b0f"
+                };
+                return thumbnails[platform] || thumbnails.unknown;
+            }
+            
+            function getRandomDuration() {
+                const minutes = Math.floor(Math.random() * 10) + 1;
+                const seconds = Math.floor(Math.random() * 60);
+                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            function getRandomViews() {
+                const views = Math.floor(Math.random() * 9000000) + 100000;
+                return `${views.toLocaleString()} views`;
+            }
+            
+            function getRandomDate() {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const month = months[Math.floor(Math.random() * 12)];
+                const day = Math.floor(Math.random() * 28) + 1;
+                const year = 2020 + Math.floor(Math.random() * 4);
+                return `${month} ${day}, ${year}`;
+            }
+            
+            function getDemoFormats(platform) {
+                const baseFormats = [
+                    { type: 'video', quality: '1080p', size: '120MB', note: 'HD Quality' },
+                    { type: 'video', quality: '720p', size: '80MB' },
+                    { type: 'video', quality: '480p', size: '45MB', note: 'Recommended for mobile' },
+                    { type: 'audio', quality: '128kbps', size: '3.5MB', note: 'Audio only' }
+                ];
+                
+                // Add platform-specific formats
+                if (platform === 'youtube') {
+                    baseFormats.unshift(
+                        { type: 'video', quality: '4K', size: '450MB', note: 'Ultra HD' },
+                        { type: 'video', quality: '1440p', size: '250MB', note: '2K Quality' }
+                    );
+                } else if (platform === 'instagram') {
+                    baseFormats[0].note = 'Best available quality';
+                    baseFormats.splice(2, 1); // Remove 480p for Instagram
+                } else if (platform === 'tiktok') {
+                    baseFormats[0].quality = '720p';
+                    baseFormats[0].size = '15MB';
+                    baseFormats[0].note = 'Maximum quality available';
+                    baseFormats.splice(1, 2); // Remove other video formats
+                }
+                
+                return baseFormats;
+            }
+        });
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=khan1819/download" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
